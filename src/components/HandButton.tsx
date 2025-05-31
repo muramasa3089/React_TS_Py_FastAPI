@@ -1,15 +1,22 @@
 type Props = {
-    hand: string;
+    hand: 'グー' | 'チョキ' | 'パー';
     onClick: () => void;
+  };
+  
+  const handImageMap: Record<Props['hand'], string> = {
+    グー: '/assets/goo.png',
+    チョキ: '/assets/choki.png',
+    パー: '/assets/pa.png',
   };
   
   export function HandButton({ hand, onClick }: Props) {
     return (
-      <button
-        onClick={onClick}
-        className="text-lg px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-700 transition"
-      >
-        {hand}
+      <button onClick={onClick} className="focus:outline-none">
+        <img
+          src={handImageMap[hand]}
+          alt={hand}
+          style={{ width: '160px', height: '160px' }}
+        />
       </button>
     );
   }

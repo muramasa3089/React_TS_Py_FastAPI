@@ -15,6 +15,9 @@ export default function JankenPage() {
   const [playerHand, setPlayerHand] = useState<Hand | null>(null);
   const [computerHand, setComputerHand] = useState<Hand | null>(null);
   const [result, setResult] = useState<string | null>(null);
+  const [fullHistory, setFullHistory] = useState<string[]>([]);
+  const [recentHistory, setRecentHistory] = useState<string[]>([]);
+
 
   const play = async (hand: Hand) => {
     setPlayerHand(hand);
@@ -28,6 +31,18 @@ export default function JankenPage() {
 
     setComputerHand(data.computer);
     setResult(data.result);
+
+    // 全体履歴に追加
+    setFullHistory(prev => [...prev, data.result]);
+
+    // 直近10戦履歴に追加（先頭に追加し、10件に制限）
+    setRecentHistory(prev => [data.result, ...prev].slice(0, 10));
+  };
+
+  const calculateWinRate = (records: string[]) => {
+    const total = records.length;
+    const wins = records.filter(r => r === '勝ち').length;
+    return total === 0 ? 0 : Math.round((wins / total) * 100);
   };
 
   return (
@@ -36,6 +51,15 @@ export default function JankenPage() {
       <div className="text-center mt-4">
         {result && <h1 className="text-2xl font-bold">結果：{result}</h1>}
       </div>
+
+        {/* 勝率表示 */}
+        {fullHistory.length > 0 && (
+            <div className="text-center mt-2 text-lg">
+                <p>試合数：{fullHistory.length}</p>
+                <p>全体の勝率：{calculateWinRate(fullHistory)}%</p>
+                <p>直近10戦の勝率：{calculateWinRate(recentHistory)}%</p>
+            </div>
+        )}
 
      {/* 中央の画像表示（左右に並べる） */}
      <div className="flex justify-center items-center flex-1 gap-20 min-h-[200px]">
@@ -68,14 +92,23 @@ export default function JankenPage() {
             )}
           </div>
         </div>
-      </div> 
+      </div>
 
       {/* 下部ボタン群 */}
-      <div className="flex justify-center gap-8 py-6 bg-red-500">
-        {hands.map((hand) => (
-          <HandButton key={hand} hand={hand} onClick={() => play(hand)} />
-        ))}
+      <div className="bg-gray-100 py-6">
+        <p className="text-center text-lg font-semibold mb-4">
+            手を選んでください
+        </p>
+        <div className="flex justify-center gap-8">
+            {hands.map((hand) => (
+            <HandButton key={hand} hand={hand} onClick={() => play(hand)} />
+            ))}
+        </div>
       </div>
+
+      {/* 全体履歴表示 */}
+
+
     </div>
   );
 }

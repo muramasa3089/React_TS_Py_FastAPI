@@ -46,7 +46,7 @@ export default function JankenPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between">
+    <div className="min-h-screen flex flex-col justify-between  bg-gradient-to-b from-pink-500 to-yellow-300">
       {/* 結果表示 */}
       <div className="text-center mt-4">
         {result && <h1 className="text-2xl font-bold">結果：{result}</h1>}

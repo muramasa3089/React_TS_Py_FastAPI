@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* index.css */
+body {
+    background: linear-gradient(to bottom, #cce4f6, #ffffff, #d3f7d4);
+}
 
 html, body, #root {
   height: 100%;

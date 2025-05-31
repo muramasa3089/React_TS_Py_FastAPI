@@ -66,7 +66,10 @@ export default function JankenPage() {
     const res = await fetch('http://localhost:8000/janken', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ player: hand }),
+      body: JSON.stringify({ 
+        player: hand ,
+        matchCount: fullHistory.length + 1, // 現在の試合数を送信
+      }),
     });
     const data = await res.json();
 

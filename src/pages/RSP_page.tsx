@@ -40,9 +40,10 @@ export default function JankenPage() {
   };
 
   const calculateWinRate = (records: string[]) => {
-    const total = records.length;
+    //const total = records.length;
+    const win_or_lose = records.filter(r => r === '勝ち' || r === '負け').length; 
     const wins = records.filter(r => r === '勝ち').length;
-    return total === 0 ? 0 : Math.round((wins / total) * 100);
+    return win_or_lose === 0 ? 0 : Math.round((wins / win_or_lose) * 100);
   };
 
   return (
@@ -105,8 +106,6 @@ export default function JankenPage() {
             ))}
         </div>
       </div>
-
-      {/* 全体履歴表示 */}
 
 
     </div>

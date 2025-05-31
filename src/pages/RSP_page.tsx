@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { HandButton } from '../components/HandButton';
 
 const hands = ['グー', 'チョキ', 'パー'] as const;
@@ -18,9 +19,49 @@ export default function JankenPage() {
   const [fullHistory, setFullHistory] = useState<string[]>([]);
   const [recentHistory, setRecentHistory] = useState<string[]>([]);
 
+  const navigate = useNavigate();  // ←★追加
+  const timerRef = useRef<NodeJS.Timeout | null>(null); // ←★追加
+
+  const [timeLeft, setTimeLeft] = useState(5); // 残り秒数
+
+  useEffect(() => {
+     // タイマーのリセット
+     if (timerRef.current) clearInterval(timerRef.current);
+
+     // 1秒ごとにカウントダウン
+     timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current!);
+            navigate('/gameover');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+  
+      // クリーンアップ
+      return () => {
+        if (timerRef.current) clearInterval(timerRef.current);
+      };
+  }, []);
+
 
   const play = async (hand: Hand) => {
     setPlayerHand(hand);
+    setTimeLeft(5); // ←★ここでタイマーをリセット！
+    // タイマーのリセットと再セット
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+        if (prev <= 1) {
+            clearInterval(timerRef.current!);
+            navigate('/gameover');
+            return 0;
+        }
+        return prev - 1;
+        });
+    }, 1000);
 
     const res = await fetch('http://localhost:8000/janken', {
       method: 'POST',
@@ -37,6 +78,7 @@ export default function JankenPage() {
 
     // 直近10戦履歴に追加（先頭に追加し、10件に制限）
     setRecentHistory(prev => [data.result, ...prev].slice(0, 10));
+
   };
 
   const calculateWinRate = (records: string[]) => {
@@ -47,7 +89,19 @@ export default function JankenPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between  bg-gradient-to-b from-pink-500 to-yellow-300">
+    <div className="min-h-screen flex flex-col justify-between relative bg-gradient-to-b from-pink-500 to-yellow-300">
+        {/* 残り時間表示（右上） */}
+      <div  style={{
+        position: 'absolute',
+        top: '8px',
+        right: '16px',
+        color: 'blue',
+        fontWeight: 'bold',
+        fontSize: '44px',
+    }}>
+        残り時間：{timeLeft} 秒
+      </div>
+
       {/* 結果表示 */}
       <div className="text-center mt-4">
         {result && <h1 className="text-2xl font-bold">結果：{result}</h1>}
